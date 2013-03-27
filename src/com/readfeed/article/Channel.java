@@ -18,7 +18,22 @@ public class Channel {
 	private String language;
 	private String generator;
 	private String lastBuildDate;
+	private String copyright;
 	
+	/**
+	 * @return copyright information of the <channel>
+	 */
+	public String getCopyright() {
+		return copyright;
+	}
+
+	/**Sets copyright information of the channel
+	 * @param copyright
+	 */
+	public void setCopyright(String copyright) {
+		this.copyright = copyright;
+	}
+
 	/**Get language encoding of the feed
 	 * @return
 	 */
@@ -141,6 +156,8 @@ public class Channel {
 			pageString += "\n" + generator;
 		if(lastBuildDate != null)
 			pageString += "\n" + lastBuildDate;
+		if(copyright != null)
+			pageString += "\n" + copyright;
 		return pageString;
 	}
 	

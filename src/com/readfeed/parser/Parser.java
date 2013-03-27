@@ -45,8 +45,8 @@ public class Parser {
 	private URL url;
 	
 	/* Stores details of the channel element of feed */
-	private Channel page = null;
-	private Document pageDocument;
+	private Channel channel = null;
+	private Document channelDocument;
 	private Article article;
 	private ArrayList<Article> articles;
 	private ArrayList<FeedLink> feedLinks = null;
@@ -81,7 +81,7 @@ public class Parser {
 		saveFeedXML();
 		if(HomeScreen.DEBUG)
 			displayFeedXML();
-		getPageDetails();
+		getChannelDetails();
 			
 	}
 	
@@ -91,12 +91,12 @@ public class Parser {
 	 */
 	private void getFeedURL() throws FeedNotFoundException{
 		try{
-			pageDocument = Jsoup.connect(url.toString()).userAgent("Mozilla/5.0 (X11; Linux i686) " +
+			channelDocument = Jsoup.connect(url.toString()).userAgent("Mozilla/5.0 (X11; Linux i686) " +
 					"AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.97 Safari/537.22").followRedirects(true).get();
 			
-			pageDocument.normalise();
+			channelDocument.normalise();
 			
-			Elements elements = pageDocument.select("link[type]");
+			Elements elements = channelDocument.select("link[type]");
 			feedLinks = new ArrayList<FeedLink>();
 			
 			for(Element element : elements){
@@ -129,11 +129,11 @@ public class Parser {
 		}
 	}
 	
-	/**Extracts the channel details and stores it in a page object.
+	/**Extracts the channel details and stores it in a Channel object.
 	 * @throws FeedNotFoundException
 	 * @throws AtomFeedNotSupportedException
 	 */
-	private void getPageDetails() throws FeedNotFoundException, AtomFeedNotSupportedException{
+	private void getChannelDetails() throws FeedNotFoundException, AtomFeedNotSupportedException{
 		XmlPullParserFactory pullParserFactory = null;
 		XmlPullParser pullParser = null;
 		try{
@@ -161,6 +161,7 @@ public class Parser {
 			boolean languageSet = false;
 			boolean generatorSet = false;
 			boolean lastBuildDateSet = false;
+			boolean copyrightSet = false;
 			
 			/* The variable 'tag' is checked for null in START_TAG and END_TAG cases to prevent NullPointerException on 
 			 * using it. */
@@ -172,9 +173,9 @@ public class Parser {
 					if(tag == null)
 						break;
 					
-					/* If <channel> tag is encountered in the feed XML, create a new page object */
+					/* If <channel> tag is encountered in the feed XML, create a new Channel object */
 					else if(tag.equals("channel")) 
-						page = new Channel();
+						channel = new Channel();
 					
 					/* If <feed> tag is found in the feed XML, throw a AtomFeedNotSupportedException */
 					else if(tag.equals("feed"))
@@ -193,24 +194,28 @@ public class Parser {
 					if(tag == null)
 						break;
 					else if(tag.equals("title") && !titleSet){
-						page.setTitle(text);
+						channel.setTitle(text);
 						titleSet = true;
 					}
 					else if(tag.equals("description") && !descriptionSet){
-						page.setDescription(text);
+						channel.setDescription(text);
 						descriptionSet = true;
 					}
 					else if(tag.equals("language") && !languageSet){
-						page.setLanguage(text);
+						channel.setLanguage(text);
 						languageSet = true;
 					}
 					else if(tag.equals("generator") && !generatorSet){
-						page.setGenerator(text);
+						channel.setGenerator(text);
 						generatorSet = true;
 					}
 					else if(tag.equals("lastBuildDate") && !lastBuildDateSet){
-						page.setLastBuildDate(text);
+						channel.setLastBuildDate(text);
 						lastBuildDateSet = true;
+					}
+					else if(tag.equals("copyright") && !copyrightSet){
+						channel.setCopyright(text);
+						copyrightSet = true;
 					}
 
 				default:
@@ -226,40 +231,40 @@ public class Parser {
 			}
 			
 			/* If <channel> was not encountered in the feed XML, throw a FeedNotFoundException */
-			if(page == null) 
+			if(channel == null) 
 				throw new FeedNotFoundException("Feed format is not supported");
 			
-			page.setLink(url);
-			page.setFeedLinks(feedLinks);
+			channel.setLink(url);
+			channel.setFeedLinks(feedLinks);
 		}
 		catch (XmlPullParserException e) {
 			if(feedLinks.size() == 1)
-				Log.d(HomeScreen.TAG, "XMLPullParserException while parsing " + domain + ".xml" +  " in Parser.getPageDetails()");
+				Log.d(HomeScreen.TAG, "XMLPullParserException while parsing " + domain + ".xml" +  " in Parser.getChannelDetails()");
 			else
-				Log.d(HomeScreen.TAG, "XMLPullParserException while parsing " + domain + "." + feedLinks.get(0).getTitle() + ".xml" +  " in Parser.getPageDetails()");
+				Log.d(HomeScreen.TAG, "XMLPullParserException while parsing " + domain + "." + feedLinks.get(0).getTitle() + ".xml" +  " in Parser.getChannelDetails()");
 			e.printStackTrace();
 		}
 		catch (FileNotFoundException e) {
 			if(feedLinks.size() == 1)
-				Log.d(HomeScreen.TAG, "FileNotFoundException while opening " + domain + ".xml" +  " in Parser.getPageDetails()");
+				Log.d(HomeScreen.TAG, "FileNotFoundException while opening " + domain + ".xml" +  " in Parser.getChannelDetails()");
 			else
-				Log.d(HomeScreen.TAG, "FileNotFoundException while opening " + domain + "." + feedLinks.get(0).getTitle() + ".xml" +  " in Parser.getPageDetails()");
+				Log.d(HomeScreen.TAG, "FileNotFoundException while opening " + domain + "." + feedLinks.get(0).getTitle() + ".xml" +  " in Parser.getChannelDetails()");
 			e.printStackTrace();
 		}
 		catch (IOException e) {
 			if(feedLinks.size() == 1)
-				Log.d(HomeScreen.TAG, "IOException while parsing " + domain + ".xml" +  " in Parser.getPageDetails()");
+				Log.d(HomeScreen.TAG, "IOException while parsing " + domain + ".xml" +  " in Parser.getChannelDetails()");
 			else
-				Log.d(HomeScreen.TAG, "IOException while parsing " + domain + "." + feedLinks.get(0).getTitle() + ".xml" +  " in Parser.getPageDetails()");
+				Log.d(HomeScreen.TAG, "IOException while parsing " + domain + "." + feedLinks.get(0).getTitle() + ".xml" +  " in Parser.getChannelDetails()");
 			e.printStackTrace();
 		}
 	}
 	
-	/**Returns a Page object with details of the channel element
-	 * @return Page
+	/**Returns a Channel object with details of the channel element
+	 * @return Channel
 	 */
-	public Channel getPage(){
-		return page;
+	public Channel getChannel(){
+		return channel;
 	}
 	
 	/** Returns the articles in the feed
@@ -384,8 +389,9 @@ public class Parser {
 						article.setAuthor(text);
 						creatorSet = true;
 					}
-					else if(tag.equals("category"))
+					else if(tag.equals("category")){
 						categories.add(text);
+					}
 					else if(tag.equals("pubDate") && !pubDateSet){
 						article.setPubDate(text);
 						pubDateSet = true;

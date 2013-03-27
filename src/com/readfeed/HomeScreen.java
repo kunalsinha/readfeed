@@ -27,8 +27,8 @@ public class HomeScreen extends Activity {
 		setContentView(R.layout.activity_home_screen);
 		
 //		Setting application wide debugging to true
-		DEBUG = true;
-//		DEBUG = false;
+//		DEBUG = true;
+		DEBUG = false;
 		/*try{
 			URLParser.getDomain(URLParser.getWellFormedURL("http:/myntra.com/login")); //fail case
 			URLParser.getDomain(URLParser.getWellFormedURL("http://http://santabanta.com/wallpapers/movies"));//fail case
@@ -45,7 +45,7 @@ public class HomeScreen extends Activity {
 			public void run() {
 				try{
 					Parser p = new Parser(URLParser.getWellFormedURL("http://www.engadget.com/"), HomeScreen.this);
-					Channel page = p.getPage();
+					Channel page = p.getChannel();
 					Log.d(HomeScreen.TAG, page.toString() + "\n");
 								
 					ArrayList<FeedLink> feedLinks = page.getFeedLinks();

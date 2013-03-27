@@ -16,6 +16,7 @@ public class Article {
 	private ArrayList<String> categories;
 	private String pubDate;
 	private URL commentURL;
+
 	private String updatePeriod; //Not used in current version
 	private String updateFrequency; //Not used in current version
 	
