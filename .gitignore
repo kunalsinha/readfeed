@@ -1,0 +1,20 @@
+#Ignore files in assets folder
+/assets/*
+
+#Ignore files in bin folder
+/bin/
+
+#Ignore files in doc folder
+/doc/
+
+#Ignore files in gen folder
+/gen/
+
+#Ignore files in libs folder
+/libs/
+
+#Ignore files in res folder
+/res/
+
+#Ignore ic_launcher-web.png file
+/ic_launcher-web.png
